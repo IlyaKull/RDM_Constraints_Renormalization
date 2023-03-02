@@ -27,8 +27,8 @@ end
 
 % CG options:
 % CGops.whichMaps = 'isometriesLeft' 
-CGops.whichMaps = 'mixLeft' 
-% CGops.whichMaps = 'mpsFlip';
+CGops.whichMaps = 'mixLeft'  
+% CGops.whichMaps = 'mpsFlip'; 
 % CGops.whichMaps = 'isometriesFlip' 
 % CGops.whichMaps = 'mixFlip' 
 
