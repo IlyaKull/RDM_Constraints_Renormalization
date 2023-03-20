@@ -3,7 +3,7 @@ message: "If you use this software, please cite it as below."
 authors: 
  - family-names: Kull
     given-names: Ilya
-    orcid: https://orcid.org/0000-0001-6490-7320 
+    orcid: "https://orcid.org/0000-0001-6490-7320"
 - family-names: Schuch 
     given-names: Norbert 
 - family-names: Dive
