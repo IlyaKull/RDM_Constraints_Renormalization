@@ -1,9 +1,15 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 authors: 
-  - family-names: Kull
+ - family-names: Kull
     given-names: Ilya
     orcid: https://orcid.org/0000-0001-6490-7320 
+- family-names: Schuch 
+    given-names: Norbert 
+- family-names: Dive
+    given-names: Ben 
+- family-names: Navascues 
+    given-names: Miguel
 title: "Reduced Density Matrix Constraints Renormalization"
 version: 1.0
 date-released: 2023-03-01
