@@ -51,8 +51,6 @@ for k=k0:n-1
                  ];
 end
 
-
-
 %% objective function (evaluate 2-body hamiltonian on rho{k0-1}
 objectiveFunc=trace( rho * tensor(H,eye(d^(k0-1))) );
 
