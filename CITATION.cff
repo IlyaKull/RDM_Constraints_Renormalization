@@ -16,5 +16,5 @@ authors:
 title: "Lower bounding ground state energies of local Hamiltonians through the renormalizatino group: Reduced Density Matrix Constraints Renormalization"
 version: 1.0
 date-released: 2023-03-01
-repository-code: "https://github.com/citation-file-format/my-research-software"
+repository-code: "https://github.com/IlyaKull/RDM_Constraints_Renormalization"
 url: "https://doi.org/10.48550/arXiv.2212.03014"
