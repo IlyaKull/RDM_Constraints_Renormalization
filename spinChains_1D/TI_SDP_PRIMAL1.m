@@ -1,9 +1,24 @@
 function [ Elower,sol,omega,k0] = TI_SDP_PRIMAL1(n,D,H,vuMPS,methodOps,yalmipOps)
 
-d=sqrt(size(H,1));
+if isstruct(H)
+    suppH=H.suppH; % the number of sites H acts on 
+    d = H.d; % the dimention of each site
+    H=H.Hamiltonian; % the Hamiltonian itself
+else % H is a d^2 x d^2 matrix
+    suppH=2;
+    d=sqrt(size(H,1));
+end
+assert(size(H,1) == d^suppH,'dimentinos of H inconsisten with support H and d')
+assert(k0+1 >= suppH,'k0+1 must be >= support H')
+
+if k0>n 
+   Elower=nan;
+   warning('%d= k0 > n = %d, no coarse-graining possible for D=%d and n=%d. aborting!!!',k0,n,D,n);
+   return
+end
  
 %% sdp variables
-[rho,omega,dims,k0]=declarePrimalVars(n,d,D);
+[rho,omega]=declarePrimalVars(n,d,D);
 if k0>=n 
    Elower=nan;
    sol.solvertime=nan;
@@ -24,7 +39,7 @@ end
 constraints=[];
 
 constraints = [constraints,...
-                   rho{k0-1} >= 0];
+                   rho  >= 0];
 
 
     for l=k0:n
@@ -34,21 +49,21 @@ constraints = [constraints,...
 
 %% local compatability constraint for rho{k0-1}
 constraints= [constraints,...
-             pTr(rho{k0-1},1,dims{k0-1}) == pTr(rho{k0-1},3,dims{k0-1}) ];
+             pTr(rho,1,[d,d^k,d]) == pTr(rho,3,[d,d^k,d]) ];
 %% normalization 
 constraints= [constraints,...
-              trace(rho{k0-1}) == 1];
+              trace(rho) == 1];
 %% objective function (evaluate 2-body hamiltonian on rho{k0-1}
 objectiveFunc=trace(...
-                   rho{k0-1} * tensor(H,eye(prod(dims{k0-1})/d^2)) ...
+                   rho * tensor(H,eye(d^(k0-1))) ...
                    );
 
 %% compatibility constraints k=k0
 V0xI=tensor(V0,eye(d)); 
 IxV0=tensor(eye(d),V0); 
 constraints = [constraints,...
-                V0xI * rho{k0-1} * V0xI' == pTr(omega{k0},1,dims{k0}),...
-                IxV0 * rho{k0-1} * IxV0' == pTr(omega{k0},3,dims{k0})...
+                V0xI * rho * V0xI' == pTr(omega{k0},1,[d,D^2,d]),...
+                IxV0 * rho * IxV0' == pTr(omega{k0},3,[d,D^2,d])...
                ];
  
 %% compatibility constraints k>k0
@@ -56,8 +71,8 @@ for k=k0:n-1
     LxI=tensor(L{k},eye(d));
     IxR=tensor(eye(d),R{k});
    constraints = [constraints,...
-                 LxI * omega{k} * LxI' == pTr(omega{k+1},1,dims{k+1}),...
-                 IxR * omega{k} * IxR' == pTr(omega{k+1},3,dims{k+1})];
+                 LxI * omega{k} * LxI' == pTr(omega{k+1},1,[d,D^2,d]),...
+                 IxR * omega{k} * IxR' == pTr(omega{k+1},3,[d,D^2,d])];
 end
 
 

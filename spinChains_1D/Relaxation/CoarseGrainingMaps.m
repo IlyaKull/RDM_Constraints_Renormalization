@@ -41,26 +41,26 @@ end
 fprintf('~~~~~~~ ')
 switch  CGops.whichMaps
     case 'isometriesLeft'
-        fprintf('Computing isometries left...\n')
+        fprintf('Computing CG maps isometries left...\n')
         [V0,L,R]= isometriesFromMPS_QR(vuMPS.AL,k0,n);
     case 'isometriesFlip'
-        fprintf('Computing isometries flip...\n')
+        fprintf('Computing CG maps  isometries flip...\n')
         [V0,L,R]= isometriesFromMPS_QR_Flip(vuMPS,k0,n);
     case 'mpsLeft'
-        fprintf('Computing MPS left...\n')
+        fprintf('Computing CG maps MPS left...\n')
         [V0,L,R]= CGmapsFromMPS_Left(vuMPS.AL,k0,n);
     case 'mpsFlip'
-        fprintf('Computing MPS flip...\n')
+        fprintf('Computing CG maps MPS flip...\n')
         [V0,L,R]= CGmapsFromMPS_Flip(vuMPS,k0,n);
     case 'mixLeft'  %from left mps
-        fprintf('Mixed CG maps \n Computing isometries left...\n')
+        fprintf('Mixed CG maps \n Computing CG maps isometries left...\n')
         [V0,Lqr,Rqr,lastP]= isometriesFromMPS_QR(vuMPS.AL,k0, nmax); %compute isometries up to nmax
-        fprintf('Computing MPS left...\n')
+        fprintf('Computing CG maps MPS left...\n')
         [~,Lmps,Rmps]= CGmapsFromMPS_Left(vuMPS.AL,k0,n); % in addition compute mps 
     case 'mixFlip'
-        fprintf('Mixed CG maps \n Computing isometries flip...\n')
+        fprintf('Mixed CG maps \n Computing CG maps isometries flip...\n')
         [V0,Lqr,Rqr,lastP]= isometriesFromMPS_QR_Flip(vuMPS,k0, nmax); %compute isometries up to nmax
-        fprintf('Computing MPS flip...\n')
+        fprintf('Computing CG maps MPS flip...\n')
         [~,Lmps,Rmps]= CGmapsFromMPS_Flip(vuMPS,k0,n); % in addition compute mps 
 end
 fprintf('~~~~~~~ Done computing CG maps. \n')

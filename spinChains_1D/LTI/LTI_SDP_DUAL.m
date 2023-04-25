@@ -1,4 +1,4 @@
-function [ ElocTIRig,ElocTI,  solInfo] = LTI_SDP_DUAL(N,H,sdpOps)
+function [ ElocTIRig,ElocTI] = LTI_SDP_DUAL(N,H,sdpOps)
 %solve the locally translation invariant problem for a state of N spins
 
 if isstruct(H)
@@ -24,7 +24,7 @@ constraints = [ expr >= 0 ];
  
 objectiveFunc = - epsil; %minus sign for maximization
 
-solInfo = optimize(constraints,objectiveFunc,sdpOps);
+ optimize(constraints,objectiveFunc,sdpOps);
 % %%
 ElocTI=-value(objectiveFunc);
  
