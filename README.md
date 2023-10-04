@@ -5,3 +5,5 @@ The main results in the paper (for 1D systems) were produced using the code in t
 The folder LTI_hierarchy_in_2D contains the code used for the 2D results in section VII of the paper.
 
 Implemented in MATLAB. YALMIP is required https://yalmip.github.io/ 
+
+A matrix-free implementaion of the SCS solver for the 1D problem is in the SCSMF folder.
