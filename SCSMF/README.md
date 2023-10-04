@@ -6,5 +6,5 @@ Representing these operations in matrix form (when the states \rho_0,\omega_1,..
 This implementation applies the maps directly, without representing them as a big matrix. 
 Every SCS iteration involoves the use of the conjugte gradient algorithm where the above operations have to be applied.
 
-The file to start with is 'demo_matrix_free_SCS_on_1D_spin_chain'
+To run start with 'demo_matrix_free_SCS_on_1D_spin_chain'
 
