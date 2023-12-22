@@ -7,7 +7,7 @@
 %% parameters to specify
 Nsites=8;              % the number of spins in the chain
 D=3;                    % the bond dimesion of the MPS used for coarse-graining
-solver='scs-direct';    % sdp solver. Install from https://github.com/cvxgrp/scs
+solver='mosek';    % sdp solver. Install from https://github.com/cvxgrp/scs
 
 
 %% load saved MPS and model data
@@ -76,6 +76,7 @@ fprintf('~~~~~~~~~~~~~~~ RESULTS: LTI ~~~~~~~~~~~~~~~~~~~~~~~~~~\n');
 fprintf('DeltaE_LTI                          = %0.10g \n',Eexact-E_LTI);              % the LTI solution output by the solver
 fprintf('DeltaE_LTI_Rigorous                 = %0.10g \n',Eexact-E_LTI_Rig);      % the rigorous LTI solution (a feasible dual point)
 fprintf('|E_LTI-E_LTI_Rigorous|              = %0.10g \n',abs(E_LTI-E_LTI_Rig));
+%%
 fprintf('~~~~~~~~~~~~~~~  RESULTS: Relaxation ~~~~~~~~~~~~~~~~~~\n');
 fprintf('DeltaE_primal                  = %0.10g \n',Eexact-E_LowerPrimal);
 fprintf('DeltaE_dual                    = %0.10g \n',Eexact-E_LowerDual);
