@@ -1,4 +1,4 @@
-function [energyFinal,energyInit,MPSopt,mpsInit]=LTI_MPSgrad_opt_test(bondDim,N,randomizeMPS,dualize) 
+function [energyFinal,energyInit,MPSopt,mpsInit]=V0_MPS_grad_opt_test(bondDim,N,randomizeMPS,dualize) 
 
  
 if nargin <4
@@ -294,40 +294,40 @@ if nargout >1
     
     
     
-    % direct computation of gradient for debugging
-    mps=permute(mpsStrings{1},[2 1 3]);
-    
-    indCell={[-(k+1), -1, 1]};
-    for l=1:k-2
-        indCell = horzcat(indCell, [l, -(l+1), l+1]);
-    end
-        indCell = horzcat(indCell, [(k-1), -(k) -(k+2)]); % add last entry
-
-        
-    dM2 = zeros(size(dM));
-   
-    % mps tensor with inds (i,j,l)
-    for i=1:bondDim
-        for j=1:d
-            for l=1:bondDim
-                Eijl  = zeros(bondDim,d,bondDim);
-                Eijl(i,j,l) = 1;
-
-                for pos=1:k
-                    % multiply k mps together for Eijl in each position
-                    toContract = [repmat({mps},1,pos-1), Eijl, repmat({mps},1,k-pos)] ;
-                    Vijl_pos = reshape( ncon(toContract ,indCell,[],[-k-2, -k-1, -k:1:-1]),bondDim^2,d^k );
-
-
-                    dM2(i,j,l) = dM2(i,j,l) + trace(...
-                                                    gamma.L * kron(Vijl_pos,eye(d)) * rhoOpt * WxI' + ...
-                                                    gamma.R * kron(eye(d),Vijl_pos) * rhoOpt * IxW' );
-                end
-            end
-        end
-    end
-    grad2= -2*  dM2(:); % minus sign because of SDP grad formula. factor 2 becuse of d(bra)/d... + d(ket)/d...
-    assert(norm(grad - grad2)<1e-14)
+% % % % %     % direct computation of gradient for debugging
+% % % % %     mps=permute(mpsStrings{1},[2 1 3]);
+% % % % %     
+% % % % %     indCell={[-(k+1), -1, 1]};
+% % % % %     for l=1:k-2
+% % % % %         indCell = horzcat(indCell, [l, -(l+1), l+1]);
+% % % % %     end
+% % % % %         indCell = horzcat(indCell, [(k-1), -(k) -(k+2)]); % add last entry
+% % % % % 
+% % % % %         
+% % % % %     dM2 = zeros(size(dM));
+% % % % %    
+% % % % %     % mps tensor with inds (i,j,l)
+% % % % %     for i=1:bondDim
+% % % % %         for j=1:d
+% % % % %             for l=1:bondDim
+% % % % %                 Eijl  = zeros(bondDim,d,bondDim);
+% % % % %                 Eijl(i,j,l) = 1;
+% % % % % 
+% % % % %                 for pos=1:k
+% % % % %                     % multiply k mps together for Eijl in each position
+% % % % %                     toContract = [repmat({mps},1,pos-1), Eijl, repmat({mps},1,k-pos)] ;
+% % % % %                     Vijl_pos = reshape( ncon(toContract ,indCell,[],[-k-2, -k-1, -k:1:-1]),bondDim^2,d^k );
+% % % % % 
+% % % % % 
+% % % % %                     dM2(i,j,l) = dM2(i,j,l) + trace(...
+% % % % %                                                     gamma.L * kron(Vijl_pos,eye(d)) * rhoOpt * WxI' + ...
+% % % % %                                                     gamma.R * kron(eye(d),Vijl_pos) * rhoOpt * IxW' );
+% % % % %                 end
+% % % % %             end
+% % % % %         end
+% % % % %     end
+% % % % %     grad2= -2*  dM2(:); % minus sign because of SDP grad formula. factor 2 becuse of d(bra)/d... + d(ket)/d...
+% % % % %     assert(norm(grad - grad2)<1e-14)
 end
 end
  

@@ -1,15 +1,15 @@
-function [energyFinal,energyInit,Wopt,W0]=LTI_grad_opt_test(D,N,Jz,maxIters,dualize) 
+function [energyFinal,energyInit,Wopt,W0,exitflag,output]=LTI_grad_opt_test_COMPLEX(D,N,H,seed,complexW) 
 
-if nargin <4
-    maxIters=1000;
-end
-if nargin <5
-    dualize=0;
-end
-d=2;
+ if nargin<4
+     seed=1;
+ end
  
-    
-h = GetTwoSiteH([-1,-1,-Jz,0,0],d);     
+    maxIters=1000;
+ 
+    dualize=0;
+h = H.interactionTerm;
+d = H.localDim;
+
  
 k=N-2;
 
@@ -25,33 +25,43 @@ end
 % [eigenvecK,eigenval]=eigs(HK,D,'smallestreal');
 [eigenvecK,eigenval]=eig(full(HK));
   
- 
+ %%
 yalmip('clear')
  
-rho_kp1=sdpvar(d^(k+1));
+rho_kp1=sdpvar(d^(k+1),d^(k+1),'hermitian','complex');
 
-omega=sdpvar(d^(2)*D);
+omega=sdpvar(d^(2)*D,d^(2)*D,'hermitian','complex');
 
+rng(seed,'twister'); 
 
-
+doGradOptimization=0;
 if D==1
-    W0 = eigenvecK(:,1)' +eigenvecK(:,2)' + eigenvecK(:,3)'     ; 
+    W0 =2*( rand(1)-0.5)*eigenvecK(:,1)' +2* ( rand(1)-0.5)*eigenvecK(:,2)'      ; 
 elseif D==d^k
     W0 = speye(D);
+    doGradOptimization=0;
 else
     W0 = eigenvecK(:,1:D)' ;
     randomizing = 1;
     if randomizing
-        rng(77,'twister'); 
+        
         warning('RANDOMIZING INITAL MAP')
-        [Q,~] = qr(randn(d^k));
+        if complexVars
+            Q=randn(d^k) + 1i*randn(d^k);
+            warning('complex INITAL MAP')
+        else
+            Q=randn(d^k) ;
+            warning('REAL INITAL MAP')
+        end
+        [Q,~] = qr(); % complex unitary
         W0 = W0*Q;
+        
     end
 end
 
 
 
-YalmipOps=sdpsettings('solver','mosek','dualize',dualize , 'verbose',0 );
+YalmipOps=sdpsettings('solver','mosek','dualize',dualize , 'verbose',0,'savesolveroutput',1 );
 YalmipOps.scs.max_iters=maxIters;
 [energyInit ] =  solveSDPandComputeGrad(k,W0,h,rho_kp1,omega,D,d,YalmipOps);
 fprintf('~~~~~ initial relaxation energy from solver : %0.10g \n', energyInit) 
@@ -60,7 +70,7 @@ fprintf('~~~~~ initial relaxation energy from solver : %0.10g \n', energyInit)
 
 f = @(x) objWrapper(x,k,h,rho_kp1,omega,D,d,YalmipOps);
  
-x0 = W0(:); 
+x0 = [real(W0(:)); imag(W0(:))]; 
 %%
  
 % options = optimoptions(@fmincon,'Algorithm','interior-point',...
@@ -72,23 +82,30 @@ x0 = W0(:);
 % dont try to check derivatives if CG dimension is bigger than physical
 % dimension. then the derivatives are just noise because the obj should
 % never change
-
-opts  = optimoptions('fminunc','CheckGradients',false,'SpecifyObjectiveGradient',true,'FiniteDifferenceType','central',...
-     'FiniteDifferenceStepSize',ones(numel(x0),1)*1e-5,...
-     'Display','iter-detailed',...
-     'OptimalityTolerance',1e-6,...
-     'FunctionTolerance',1e-6 ,...
-     'StepTolerance',1e-5,...
-     'Algorithm','quasi-newton' );
- % , 'MaxFunctionEvaluations', 20 ... 
- 
-    
+if doGradOptimization
+    opts  = optimoptions('fminunc','CheckGradients',true,'SpecifyObjectiveGradient',true,'FiniteDifferenceType','central',...
+         'FiniteDifferenceStepSize',ones(numel(x0),1)*1e-5,...
+         'Display','iter-detailed',...
+         'OptimalityTolerance',1e-6,...
+         'FunctionTolerance',1e-6 ,...
+         'StepTolerance',1e-5,...
+         'Algorithm','quasi-newton' );
+     % , 'MaxFunctionEvaluations', 20 ... 
 
 
-[x,fval,exitflag,output]  = fminunc(f,x0,opts) ;
 
-energyFinal = -fval;
-Wopt = reshape(x,D,d^k);
+
+    [x,fval,exitflag,output]  = fminunc(f,x0,opts) ;
+
+    energyFinal = -fval;
+    Wopt = reshape(x(1:D*d^k),D,d^k) + 1i*reshape(x(D*d^k+1:2*D*d^k),D,d^k);
+else
+     x=x0;
+     exitflag=[];
+     output=[];
+     energyFinal = energyInit;
+     Wopt = W0;
+end
 
 end    
    
@@ -96,7 +113,7 @@ end
 
 
 function [obj,grad] = objWrapper(x,k,h,rho_kp1,omega,D,d,YalmipOps)
-    W = reshape(x,D,d^k); 
+    W = reshape(x(1:D*d^k),D,d^k) + 1i*reshape(x(D*d^k+1:2*D*d^k),D,d^k);
     if nargout >1
         [optEnergy,gradEnergy] =   solveSDPandComputeGrad(k,W,h,rho_kp1,omega,D,d,YalmipOps);
         grad= -gradEnergy; % minus sign because we minimize(-f) instead of max(f)
@@ -124,7 +141,7 @@ optEnergy = value( objFunc);
 %% compute gradient
 if nargout >1
 
-    gamma = struct('L',zeros(d*D),'R',zeros(d*D));
+    gamma = struct('L',zeros(d*D) +1i*zeros(d*D) ,'R',zeros(d*D) +1i*zeros(d*D) );
     
     fns = fieldnames(gamma);
     lowerTriangIndices = tril(true(d*D));
@@ -150,7 +167,7 @@ if nargout >1
                 ncon({decomposeLegs(gamma.L * WxI * rhoOpt,[D d],d*ones(1,k+1))},{[-1 1, -(k+1):1:-2, 1]} )+ ...
                 ncon({decomposeLegs(gamma.R * IxW * rhoOpt,[d D],d*ones(1,k+1))},{[1 -1 1, -(k+1):1:-2]} ), ...
                      D,d^k);
-    grad = dW(:);
+    grad = [real(dW(:));imag(dW(:))];
      
     
     if 0  % test complementarity slackness

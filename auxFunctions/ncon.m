@@ -331,11 +331,11 @@ function [sequence legLinks] = checkInputs(tensorList,legLinks,finalOrder,sequen
             end
         end
         % Check all tensors are numeric
-        for a=1:numel(tensorList)
-            if ~isnumeric(tensorList{a})
-                error('Tensor list must be a 1xn cell array of numerical objects')
-            end
-        end
+%         for a=1:numel(tensorList)
+%             if ~isnumeric(tensorList{a})
+%                 error('Tensor list must be a 1xn cell array of numerical objects')
+%             end
+%         end
         % If finalOrder is provided, check it is a list of unique negative integers
         if ~isempty(finalOrder)
             if ~isnumeric(finalOrder)

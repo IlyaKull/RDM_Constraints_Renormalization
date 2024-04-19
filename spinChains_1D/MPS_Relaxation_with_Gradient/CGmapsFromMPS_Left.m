@@ -1,24 +1,37 @@
-function [V0 ,L,R]= CGmapsFromMPS(vuMPS,k0,n)
+function [V0 ,L,R,mps]= CGmapsFromMPS_Left(vuMPS,k0,n,inputFormat)
 % instead of computing isometries from MPS JUST USE MPS products
 % this makes an SDP which is equivalent to the one that uses isometries
 % when the MPS is injective. This is because in this case the isometries
 % and are related to the MPS products by an invertible map (P in the
 % previous functions)
     
-% reshape vuMPS from cell to 3dim array 
-d=length(vuMPS);
-D=size(vuMPS{1,1},1);
-mps=zeros(D,d,D);
-for l=1:d
-    mps(:,l,:)=vuMPS{l,1};
+
+if nargin<4
+    inputFormat=0;
 end
- 
+
+if inputFormat==0
+    % reshape vuMPS from cell to 3dim array 
+    d=length(vuMPS);
+    D=size(vuMPS{1,1},1);
+    mps=zeros(D,d,D);
+    for l=1:d
+        mps(:,l,:)=vuMPS{l,1};
+    end
+
+else
+   mps=vuMPS;
+   D=size(mps,1);
+   d=size(mps,2);
+   assert(D==size(mps,3),'CHECK MPS DIMS')
+end
+
 % create 'inflated mps' for later use
 mpsInflatedR=zeros(D^2,d,D^2);
 mpsInflatedL=zeros(D^2,d,D^2);
 for l=1:d
-    mpsInflatedR(:,l,:)=tensor(eye(D),vuMPS{l,1});
-    mpsInflatedL(:,l,:)=tensor(vuMPS{l,1},eye(D));
+    mpsInflatedR(:,l,:)=tensor(eye(D),squeeze(mps(:,l,:)));
+    mpsInflatedL(:,l,:)=tensor(squeeze(mps(:,l,:)),eye(D));
 end
 
 % no left and right isometries if there is only one coarser-graining step

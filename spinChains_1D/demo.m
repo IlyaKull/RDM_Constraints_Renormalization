@@ -18,7 +18,7 @@ MPS=MPS{D};
 upperBdFromMPS=upperBdFromMPS(D);
 H=struct('suppH',2,'d',2,'Hamiltonian',H);
 d=H.d;
-k0=ceil(2*log(D)/log(d)); % number of spins on which the first coarse-graining map acts. chosen such that d^k0 > D^2
+k0=floor(2*log(D)/log(d))+1; % number of spins on which the first coarse-graining map acts. chosen such that d^k0 > D^2
 
 %% LTI problem
 % this solves the locally translation invariant (LTI) problem of size Nsites
