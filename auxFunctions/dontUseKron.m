@@ -1,7 +1,7 @@
 function [K] = dontUseKron(X,D,d,order)
 % produces  kron(eye(d),X) [[[order='IX']]
 % and kron(X,eye(d)) [[[order='XI']]
-% wihout using kron (kron for sdpvars is very slow for large variables).
+% wihout using kron (kron for sdpvars (yalmip variables) is very slow for large variables).
 
 % 
 assert(D==size(X,1));
