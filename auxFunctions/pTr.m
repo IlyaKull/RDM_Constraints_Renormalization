@@ -65,7 +65,7 @@ if any(size(p) == 1)
   x = x*x';
 
 
-else
+else 
   % density matrix
 
   % reshape density matrix into tensor with one row and one column index
